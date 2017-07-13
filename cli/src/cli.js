@@ -6,7 +6,6 @@ const colors = require('colors')
 
 export const cli = vorpal()
 
-
 let username
 let server
 
@@ -14,20 +13,17 @@ cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
 
 cli
-  .mode('connect <username> ')
+  .mode('connect <username> <host> <port>')
   .delimiter(cli.chalk['green']('connected>'))
   .init(function (args, callback) {
     username = args.username
-    let host = args.host | 'localhost'
-    let port = args.port | 8080
-    server = connect({ host: host, port: port }, () => {
-      server.write(new Message({ username, command: 'connect', contents: ' has connected' }).toJSON() + '\n')
+    server = connect({ host: 'localhost', port: 8080 }, () => {
+      server.write(new Message({ username, command: 'connect', contents }).toJSON() + '\n')
       callback()
     })
 
     server.on('data', (buffer) => {
-      let mes = Message.fromJSON(buffer)
-      this.log(mes.toString())
+      this.log(Message.fromJSON(buffer).toString())
     })
 
     server.on('end', () => {
@@ -39,13 +35,11 @@ cli
     const contents = rest.join(' ')
 
     if (command === 'disconnect') {
-      server.end(new Message({ username, command, contents: ' has disconnected' }).toJSON() + '\n')
-    } else if (command === 'echo' || command === 'broadcast') {
+      server.end(new Message({ username, command }).toJSON() + '\n')
+    } else if (command === 'echo') {
       server.write(new Message({ username, command, contents }).toJSON() + '\n')
-    } else if (command === 'wisper') {
-      server.write(new Message({ username, command, contents }).toJSON() + '\n')
-    } else if (command === 'users') {
-      server.write(new Message({ username, command, contents }).toJSON() + '\n')
+    } else if (command === 'username') {
+      server.write(new Message({username, command, contents}).toJSON() + '\n')
     } else {
       this.log(`Command <${command}> was not recognized`)
     }
