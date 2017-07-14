@@ -1,3 +1,5 @@
+import { cli } from 'cli'
+
 export class Message {
   static fromJSON (buffer) {
     return new Message(JSON.parse(buffer.toString()))
@@ -18,6 +20,17 @@ export class Message {
   }
 
   toString () {
-    return this.contents
+    if (this.command === 'disconnect') {
+      cli.chalk(['red'])
+      return (this.username + ' ' + this.command + ' ' + this.contents)
+    } else if (this.command === 'broadcast') {
+      cli.chalk(['blue'])
+      return (this.username + ' ' + this.command + ' ' + this.contents)
+    } else if (this.command === 'echo') {
+      cli.chalk(['magenta'])
+    } else {
+      return this.log(`Command <${this.command}> was not recognized`)
+    }
+    return (this.username + ' ' + this.command + ' ' + this.contents)
   }
 }

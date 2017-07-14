@@ -2,12 +2,9 @@ import vorpal from 'vorpal'
 import { words } from 'lodash'
 import { connect } from 'net'
 import { Message } from './Message'
-const clc = require('cli-color')
 
 export const cli = vorpal()
 
-const Disconnect = clc.red
-const UsernameColor = clc.magenta
 let username
 let server
 
@@ -20,7 +17,7 @@ cli
   .init(function (args, callback) {
     username = args.username
     server = connect({ host: 'localhost', port: 8080 }, () => {
-      server.write(new Message({ username, command: 'connect', contents }).toJSON() + '\n')
+      server.write(new Message({ username, command: 'connect' }).toJSON() + '\n')
       callback()
     })
 
@@ -40,9 +37,7 @@ cli
       server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
       server.write(new Message({ username, command, contents }).toJSON() + '\n')
-    } else if (command === 'username') {
-      server.write(new Message({ username, command, contents}).toJSON() + '\n')
-    } else if (command === 'broadcast') {
+    } else if (command === 'connect') {
       server.write(new Message({ username, command, contents}).toJSON() + '\n')
     }else {
       this.log(`Command <${command}> was not recognized`)
